@@ -1,0 +1,13 @@
+@(models:Seq[String])
+
+@main("Models - " + play.Play.configuration.get("application.name")) {
+    <h1>Models</h1>
+
+    <p>Click on an activity to launch it:</p>
+
+    <ul>
+    @models.map { model =>
+        <li>@a(controllers.Activities.run(model)) { @model }</li>
+    }
+    </ul>
+}
