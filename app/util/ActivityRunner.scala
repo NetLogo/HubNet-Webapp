@@ -71,6 +71,8 @@ class ActivityRunner(val model: File) extends Job {
   private val _id = ActivityRunner.registerNewActivity(this)
   def id = _id
 
+  var port: Option[Int] = None
+
   /**
    * Anyone who needs to be notified of changes to the activity state
    * can add themselves to this list.
@@ -100,7 +102,7 @@ class ActivityRunner(val model: File) extends Job {
     // But using sealed traits means having to duplicate what I've defined in the abstract
     // class ActivityState into all its subclasses.
     // I'm sure there's a cleaner way to do what I'm doing here, I just haven't found it yet.
-    while (!(newState == ActivityState.Running || newState.isInstanceOf[ActivityState.Error])) {
+    while (!(newState.isInstanceOf[ActivityState.Running] || newState.isInstanceOf[ActivityState.Error])) {
       newState = listener receive {
         case state: ActivityState => state
       }
@@ -186,8 +188,12 @@ class ActivityRunner(val model: File) extends Job {
           errorMessageBuilder.append(line + "\n")
         }
 
-        if (line.contains("The model is running")) {
-          status = ActivityState.Running
+        if (line.contains("Running on port:")) {            // This has to appear in RunHeadless output first...
+          port = Some(line.split(" ").last.toInt)
+        }
+        else if (line.contains("The model is running")) {   // ... and then this.
+          status = ActivityState.Running(port.getOrElse(
+            error("The port that the activity is running on has not yet been specified.")))
         }
         else if (line.contains("** Error")) {
           currentlyReadingErrorMessage = true

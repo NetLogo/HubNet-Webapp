@@ -18,10 +18,16 @@ public class RunHeadless {
       HeadlessWorkspace workspace = HeadlessWorkspace.newInstance();
       workspace.open(filename);
       workspace.command("startup");
+
+      // The HubNet webapp looks for this line in the output to determine
+      // the port that the activity is running on.
+      System.out.println("Running on port: " + workspace.hubnetManager().getPort());
+
       workspace.command("setup");
       
       // The HubNet webapp looks for this line in the output to determine
-      // that launching the activity was successful, so do not change this.
+      // that launching the activity was successful, and that startup/setup
+      // got called without problems.
       // See: app/controllers/Activities.scala
       System.out.println("The model is running...");
       

@@ -20,7 +20,11 @@ object ActivityState {
     case class Launching(progress: Int) extends Loading(progress, "Launching")
   }
 
-  case object Running extends ActivityState("Running")
+  case class Running(port: Int) extends ActivityState("Running") {
+    override def toString = "Running on port " + port
+    override def toJson = " { \"status\": \"Running\"," +
+                              "\"port\": \"" + port + "\"}"
+  }
 
   abstract class Error(message: String) extends ActivityState("Error") {
     override def toString = "Error: " + message
