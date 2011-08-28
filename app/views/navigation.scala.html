@@ -1,0 +1,15 @@
+@import play.mvc._
+@import controllers._
+
+@navItem(name: String, href: String) = {
+    @if(href == Http.Request.current().path) {
+        <li>@name</li>
+    } else {
+        <li><a href="@href">@name</a></li>
+    }
+}
+
+<ul id="nav">
+    @navItem("Home", action(Application.index))
+    @navItem("Activities", action(Activities.list))
+</ul>

@@ -1,4 +1,4 @@
-@(title:String = "", scripts:Seq[String])(body: => Html)
+@(title:String = "", scripts:Seq[String], showNavigationBar:Boolean=true)(body: => Html)
 
 <!DOCTYPE html>
 <html>
@@ -14,6 +14,7 @@
 
     </head>
     <body>
+        @if(showNavigationBar) { @navigation() }
         @body
     </body>
 </html>
