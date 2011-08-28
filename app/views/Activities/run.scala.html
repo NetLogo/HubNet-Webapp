@@ -41,11 +41,26 @@
                       + 'height="100%" '
                       + 'hspace="0" '
                       + 'vspace="0" '
-                      + 'id="hubnet-client">'
+                      + 'id="hubnet-client" '
+                      + 'mayscript>'
                     + '<param name="port" value="' + port + '">'
                     + '<param name="role" value="controller">'
+                    + '<param name="notify" value="true">'
                     + 'Java must be installed and applets must be enabled in order to run HubNet activities in the browser.'
                     + '</applet>');
+        }
+
+        function handleActivityEvent(event, eventArgs) {
+            switch(event) {
+                case 'login complete':
+                    break;
+                case 'size changed':
+                    var activityWidth = eventArgs[0];
+                    var activityHeight = eventArgs[1];
+                    $("#activity-container").width(activityWidth);
+                    $("#activity-container").height(activityHeight);
+                    break;
+            }
         }
 
         function errorAsHtml(error) {
