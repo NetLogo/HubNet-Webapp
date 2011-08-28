@@ -16,9 +16,11 @@ object Activities extends Controller {
   val modelsDir = new File(Play.configuration.getProperty("netlogo.models.path"))
 
   def list = {
+    val runningActivities = ActivityRunner.activities.values
+
     val path = new File(modelsDir.getAbsolutePath)
-    val models = path.listFiles().filter(file => file.isFile && file.getName.endsWith(".nlogo")).map(_.getName)
-    html.list(models)
+    val availableActivities = path.listFiles().filter(file => file.isFile && file.getName.endsWith(".nlogo")).map(_.getName)
+    html.list(runningActivities, availableActivities)
   }
 
   def run(model: String) = {
@@ -29,6 +31,16 @@ object Activities extends Controller {
       html.run(runner.id, model)
     } else {
       throw new IllegalArgumentException    // TODO: Show an error page instead
+    }
+  }
+
+  def manage(id: Int) = {
+    if (ActivityRunner.activities.contains(id)) {
+      val activity = ActivityRunner.activities(id)
+      html.manage(activity)
+    } else {
+      flash += ("error" -> "The specified activity is invalid.  Please try again or select a different activity from the list.")
+      Action(list)
     }
   }
 

@@ -1,13 +1,36 @@
-@(models:Seq[String])
+@(runningActivities:Iterable[util.ActivityRunner], availableActivities:Seq[String])(implicit flash:play.mvc.Scope.Flash)
 
-@main("Models - " + play.Play.configuration.get("application.name")) {
+@main("Models - " + play.Play.configuration.get("application.name"), Nil) {
     <h1>Models</h1>
 
+    <h2>Running Activities</h2>
+
+    @if(flash.get("error")) {
+        <p style="color:#c00">
+            @flash.get("error")
+        </p>
+    }
+
+    @if(runningActivities.isEmpty) {
+        <p>No activities are currently running.</p>
+    } else {
+        <table>
+        @runningActivities.map { activity =>
+            <tr>
+                <td>@activity.model.getName</td>
+                <td>@a(controllers.Activities.manage(activity.id)) { Manage }</td>
+            </tr>
+        }
+        </table>
+    }
+
+    <h2>Launch New Activity</h2>
+        
     <p>Click on an activity to launch it:</p>
 
     <ul>
-    @models.map { model =>
-        <li>@a(controllers.Activities.run(model)) { @model }</li>
+    @availableActivities.map { activity =>
+        <li>@a(controllers.Activities.run(activity)) { @activity }</li>
     }
     </ul>
 }

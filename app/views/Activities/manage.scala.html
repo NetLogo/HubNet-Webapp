@@ -1,0 +1,19 @@
+@(activity:util.ActivityRunner)
+
+@main(activity.model.getName + " - " + play.Play.configuration.get("application.name"), List("applet.js")) {
+    <h1>@activity.model.getName</h1>
+
+    <div id="activity-container">
+        <span id="activity-status">Loading...</span>
+    </div>
+
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            launchApplet(@activity.port.get);
+        });
+
+        window.setInterval(function() {
+            $("#activity-status:contains('Loading...')").append('.');
+        }, 1000);
+    </script>
+}

@@ -1,6 +1,6 @@
 @(id:Int, model:String)
 
-@main(model + " - " + play.Play.configuration.get("application.name")) {
+@main(model + " - " + play.Play.configuration.get("application.name"), List("applet.js")) {
     <h1>@model</h1>
 
     <div id="activity-container">
@@ -8,17 +8,10 @@
     </div>
 
     <script type="text/javascript" charset="utf-8">
-        // For debugging purposes only: show an alert box for poorly-formed JSON responses from the server.
-        $.ajaxSetup({"error":function(XMLHttpRequest,textStatus, errorThrown) {   
-            alert(textStatus);
-            alert(errorThrown);
-            alert(XMLHttpRequest.responseText);
-        }});
-
         $(document).ready(function() {
             $.post('@action(controllers.Activities.waitToLoad(id))', function(response) {
                 if (response.status == "Running") {
-                    $("#activity-container").text('Done! Launching applet...');
+                    $("#activity-status").text('Launching applet...');
                     launchApplet(response.port);
                 }
                 else if (response.status == "Error") {
@@ -29,44 +22,7 @@
 
         window.setInterval(function() {
             $("#activity-status:contains('Loading...')").append('.');
+            $("#activity-status:contains('Launching applet...')").append('.');
         }, 1000);
-        
-        function launchApplet(port) {
-            $("#activity-container").width(1600);
-            $("#activity-container").height(1200);
-            $("#activity-container").append(
-                '<applet code="org.nlogo.hubnet.client.ClientApplet.class" '
-                      + 'archive="@asset("public/jars/NetLogo.jar"),@asset("public/jars/scala-library.jar")" '
-                      + 'width="100%" '
-                      + 'height="100%" '
-                      + 'hspace="0" '
-                      + 'vspace="0" '
-                      + 'id="hubnet-client" '
-                      + 'mayscript>'
-                    + '<param name="port" value="' + port + '">'
-                    + '<param name="role" value="controller">'
-                    + '<param name="notify" value="true">'
-                    + 'Java must be installed and applets must be enabled in order to run HubNet activities in the browser.'
-                    + '</applet>');
-        }
-
-        function handleActivityEvent(event, eventArgs) {
-            switch(event) {
-                case 'login complete':
-                    break;
-                case 'size changed':
-                    var activityWidth = eventArgs[0];
-                    var activityHeight = eventArgs[1];
-                    $("#activity-container").width(activityWidth);
-                    $("#activity-container").height(activityHeight);
-                    break;
-            }
-        }
-
-        function errorAsHtml(error) {
-            return '<div id="error"><p><b>An error occurred while launching the model:</b></p>'
-                + '<pre>' + error.message + '</pre>'
-                + '</div>';
-        }
     </script>
 }
