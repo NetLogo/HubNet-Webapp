@@ -73,6 +73,9 @@ class ActivityRunner(val model: File) extends Job {
 
   var port: Option[Int] = None
 
+  // The process in which this activity will be running
+  var proc: java.lang.Process = null
+
   /**
    * Anyone who needs to be notified of changes to the activity state
    * can add themselves to this list.
@@ -153,7 +156,6 @@ class ActivityRunner(val model: File) extends Job {
 
     status = ActivityState.Loading.BuildingLauncher(progress = 50)
 
-    var proc: java.lang.Process = null
     val errorMessageBuilder = new StringBuilder()
 
     project.fireBuildStarted()
@@ -249,5 +251,14 @@ class ActivityRunner(val model: File) extends Job {
         println("** Error: Exception occurred while executing RunHeadless:")
         e.printStackTrace()
     }
+  }
+
+  /**
+   * Stops the activity from running by killing the process.
+   */
+  def stop() {
+    proc.destroy()
+    status = ActivityState.Finished
+    port = None
   }
 }

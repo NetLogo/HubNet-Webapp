@@ -63,4 +63,20 @@ object Activities extends Controller {
     val activity = ActivityRunner.activities(id)
     html.local(activity.model.getName, activity.port.get, activity.getNextLocalClientUsername())
   }
+
+  /**
+   * Stops an activity with the given ID. This kills the process in which the activity is
+   * running.
+   */
+  def stop(id: Int) = {
+    if (ActivityRunner.activities.contains(id)) {
+      val activity = ActivityRunner.activities(id)
+      activity.stop()
+      flash += ("info" -> ("The activity " + activity.model.getName + " has been stopped successfully."))
+      ActivityRunner.activities.remove(id)
+    } else {
+      flash += ("error" -> "The specified activity is invalid.  Please try again or select a different activity from the list.")
+    }
+    Action(list)
+  }
 }

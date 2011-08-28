@@ -5,6 +5,10 @@
 
     <h2>Running Activities</h2>
 
+    @if(flash.get("info")) {
+        <p> @flash.get("info") </p>
+    }
+
     @if(flash.get("error")) {
         <p style="color:#c00">
             @flash.get("error")
@@ -19,6 +23,7 @@
             <tr>
                 <td>@activity.model.getName</td>
                 <td>@a(controllers.Activities.manage(activity.id)) { Manage }</td>
+                <td>@a(controllers.Activities.stop(activity.id)) { Stop }</td>
             </tr>
         }
         </table>
