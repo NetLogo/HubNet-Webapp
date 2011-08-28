@@ -16,7 +16,7 @@ $.ajaxSetup({"error":function(XMLHttpRequest,textStatus, errorThrown) {
     alert(XMLHttpRequest.responseText);
 }});
 
-function launchApplet(port) {
+function launchApplet(port, role, user) {
     $("#activity-container").width(1600);
     $("#activity-container").height(1200);
     $("#activity-container").append(
@@ -29,7 +29,8 @@ function launchApplet(port) {
               + 'id="hubnet-client" '
               + 'mayscript>'
             + '<param name="port" value="' + port + '">'
-            + '<param name="role" value="controller">'
+            + '<param name="role" value="' + role + '">'
+            + (user ? ('<param name="user" value="' + user + '">') : "")
             + '<param name="notify" value="true">'
             + 'Java must be installed and applets must be enabled in order to run HubNet activities in the browser.'
             + '</applet>');
@@ -59,3 +60,8 @@ function errorAsHtml(error) {
         + '<pre>' + error.message + '</pre>'
         + '</div>';
 }
+
+window.setInterval(function() {
+    $("#activity-status:contains('Loading...')").append('.');
+    $("#activity-status:contains('Launching applet...')").append('.');
+}, 1000);

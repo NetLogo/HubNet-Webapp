@@ -88,6 +88,14 @@ class ActivityRunner(val model: File) extends Job {
     }
   }
 
+  // Local clients
+  var localClientCounter = 0
+  def localClientPrefix = "user "   // NetLogo uses "Local", so we'll use something else to avoid any conflicts.
+  def getNextLocalClientUsername() = {
+    localClientCounter = localClientCounter + 1
+    localClientPrefix + localClientCounter
+  }
+
   /**
    * Blocks until the activity is loaded (or until there is an error).
    */

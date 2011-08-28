@@ -9,11 +9,12 @@
 
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
-            launchApplet(@activity.port.get);
-        });
+            launchApplet(@activity.port.get, "controller");
 
-        window.setInterval(function() {
-            $("#activity-status:contains('Loading...')").append('.');
-        }, 1000);
+            // Add a link for launching local clients
+            $("#activity-container").append(
+                '<a href="@action(controllers.Activities.local(activity.id))" target="_blank">Launch local client</a>'
+                );
+        });
     </script>
 }

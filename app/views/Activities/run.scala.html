@@ -12,17 +12,17 @@
             $.post('@action(controllers.Activities.waitToLoad(id))', function(response) {
                 if (response.status == "Running") {
                     $("#activity-status").text('Launching applet...');
-                    launchApplet(response.port);
+                    launchApplet(response.port, "controller");
+
+                    // Add a link for launching local clients
+                    $("#activity-container").append(
+                        '<a href="@action(controllers.Activities.local(id))" target="_blank">Launch local client</a>'
+                        );
                 }
                 else if (response.status == "Error") {
                     $("#activity-status").replaceWith(errorAsHtml(response));
                 }
             });
         });
-
-        window.setInterval(function() {
-            $("#activity-status:contains('Loading...')").append('.');
-            $("#activity-status:contains('Launching applet...')").append('.');
-        }, 1000);
     </script>
 }

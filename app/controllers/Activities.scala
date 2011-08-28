@@ -55,4 +55,12 @@ object Activities extends Controller {
     ActivityRunner.activities(id).waitToLoad()
     status(id)
   }
+
+  /**
+   * Launches a local client in the activity with the given ID.
+   */
+  def local(id: Int) = {
+    val activity = ActivityRunner.activities(id)
+    html.local(activity.model.getName, activity.port.get, activity.getNextLocalClientUsername())
+  }
 }

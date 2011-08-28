@@ -1,0 +1,13 @@
+@(activityName: String, port: Int, username: String)
+
+@main(username + " (" + activityName + ") - " + play.Play.configuration.get("application.name"), List("applet.js")) {
+    <div id="activity-container">
+        <span id="activity-status">Loading...</span>
+    </div>
+
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            launchApplet(@port, "participant", "@username");
+        });
+    </script>
+}
