@@ -1,7 +1,7 @@
-@(id:Int, model:String)
+@(activity: models.Activity)
 
-@main(model + " - " + play.Play.configuration.get("application.name"), List("applet.js")) {
-    <h1>@model</h1>
+@main(activity.name + " - " + play.Play.configuration.get("application.name"), List("applet.js")) {
+    <h1>@activity.name</h1>
 
     <div id="activity-container">
         <span id="activity-status">Loading...</span>
@@ -9,14 +9,14 @@
 
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
-            $.post('@action(controllers.Activities.waitToLoad(id))', function(response) {
+            $.post('@action(controllers.Activities.waitToLoad(activity.id))', function(response) {
                 if (response.status == "Running") {
                     $("#activity-status").text('Launching applet...');
                     launchApplet(response.port, "controller");
 
                     // Add a link for launching local clients
                     $("#activity-container").append(
-                        '<a href="@action(controllers.Activities.local(id))" target="_blank">Launch local client</a>'
+                        '<a href="@action(controllers.Activities.local(activity.id))" target="_blank">Launch local client</a>'
                         );
                 }
                 else if (response.status == "Error") {

@@ -1,9 +1,7 @@
-@(runningActivities:Iterable[util.ActivityRunner], availableActivities:Seq[String])(implicit flash:play.mvc.Scope.Flash)
+@(runningActivities:Iterable[models.Activity], availableActivities:Seq[String])(implicit flash:play.mvc.Scope.Flash)
 
 @main("Models - " + play.Play.configuration.get("application.name"), Nil) {
     <h1>Activities</h1>
-
-    <h2>Running Activities</h2>
 
     @if(flash.get("info")) {
         <p> @flash.get("info") </p>
@@ -15,13 +13,15 @@
         </p>
     }
 
+    <h2>Running Activities</h2>
+
     @if(runningActivities.isEmpty) {
         <p>No activities are currently running.</p>
     } else {
         <table>
         @runningActivities.map { activity =>
             <tr>
-                <td>@activity.model.getName</td>
+                <td>@activity.name</td>
                 <td>@a(controllers.Activities.manage(activity.id)) { Manage }</td>
                 <td>@a(controllers.Activities.stop(activity.id)) { Stop }</td>
             </tr>

@@ -1,14 +1,20 @@
 package util
 
-abstract class ActivityState(description: String) {
+abstract class ActivityStatus(description: String) {
   override def toString = description
   def toJson = "{\"status\": \"" + description + "\"}"
 }
 
-object ActivityState {
-  case object NotStarted extends ActivityState("Not started")
+object ActivityStatus {
 
-  abstract class Loading(progress: Int, subtask: String) extends ActivityState("Loading") {
+  /***** NotStarted *****/
+
+  case object NotStarted extends ActivityStatus("Not started")
+
+
+  /***** Loading *****/
+
+  abstract class Loading(progress: Int, subtask: String) extends ActivityStatus("Loading") {
     override def toString = "Loading [" + progress + "%] (" + subtask + ")"
     override def toJson = "{\"status\": \"Loading\"," +
                            "\"progress\": \"" + progress + "\"," +
@@ -20,13 +26,19 @@ object ActivityState {
     case class Launching(progress: Int) extends Loading(progress, "Launching")
   }
 
-  case class Running(port: Int) extends ActivityState("Running") {
+
+  /***** Running *****/
+
+  case class Running(port: Int) extends ActivityStatus("Running") {
     override def toString = "Running on port " + port
     override def toJson = " { \"status\": \"Running\"," +
                               "\"port\": \"" + port + "\"}"
   }
 
-  abstract class Error(message: String) extends ActivityState("Error") {
+
+  /***** Error *****/
+
+  abstract class Error(message: String) extends ActivityStatus("Error") {
     override def toString = "Error: " + message
     override def toJson = "{\"status\": \"Error\"," +
                            "\"message\": \"" + org.json.simple.JSONObject.escape(message) + "\"}"
@@ -36,7 +48,11 @@ object ActivityState {
     case class LaunchFailure(message: String) extends Error(message)
     case class FileNotFound(filename: String)
       extends Error("The model file could not be found: " + filename)
+    case class InvalidActivity() extends Error("Invalid activity.")
   }
 
-  case object Finished extends ActivityState("Finished")
+
+  /***** Finished *****/
+
+  case object Finished extends ActivityStatus("Finished")
 }

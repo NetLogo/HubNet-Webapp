@@ -28,7 +28,7 @@ public class RunHeadless {
       // The HubNet webapp looks for this line in the output to determine
       // that launching the activity was successful, and that startup/setup
       // got called without problems.
-      // See: app/controllers/Activities.scala
+      // See: app/util/ActivityLauncher.scala
       System.out.println("The model is running...");
       
       while(true) {
