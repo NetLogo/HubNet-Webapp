@@ -3,13 +3,28 @@
 
 @navItem(name: String, href: String) = {
     @if(href == Http.Request.current().path) {
-        <li>@name</li>
+        <li class="nav-item">@name</li>
     } else {
-        <li><a href="@href">@name</a></li>
+        <li class="nav-item"><a href="@href">@name</a></li>
     }
 }
+
+<div id="nav-bar">
 
 <ul id="nav">
     @navItem("Home", action(Application.index))
     @navItem("Activities", action(Activities.list))
 </ul>
+
+<span class="user">
+@if(play.mvc.Scope.Session.current().get("username")) {
+  Logged in as: <b>@play.mvc.Scope.Session.current().get("username")</b> (@a(controllers.Authentication.logout) {Logout})
+} else {
+  You are currently not logged in. @a(controllers.Authentication.login) {Login} | @a(controllers.Authentication.register) {Register}
+}
+</span>
+
+<div style="clear: both;"></div> 
+
+</div>
+

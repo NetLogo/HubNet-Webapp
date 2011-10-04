@@ -11,5 +11,9 @@ GET     /favicon.ico                            404
 # Map static resources from the /app/public folder to the /public path
 GET     /public/                                staticDir:public
 
+# Create shorter URLs for registration and login
+*       /login                                  Authentication.login
+*       /register                               Authentication.register
+
 # Catch all
 *       /{controller}/{action}                  {controller}.{action}

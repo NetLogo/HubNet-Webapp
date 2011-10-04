@@ -1,0 +1,28 @@
+@()(implicit flash:play.mvc.Scope.Flash, errors:Map[String,play.data.validation.Error])
+
+@main("Login", Nil) {
+    <h1>Register</h1>
+
+    @if(flash.get("error")) {
+        <p style="color:#c00">
+            @flash.get("error")
+        </p>
+    }
+
+    <ul>
+    @if(errors) {
+        <p style="color:#c00">
+
+        </p>
+        @for((field, error) <- errors) {
+            <li>@error</li>
+        }
+    }
+    </ul>
+
+    <form action="@action(controllers.Authentication.register)" method="POST">
+        Create a username: <input type="text" name="username" /><br/>
+        Create a password: <input type="text" name="password" /><br/>
+        <input type="submit" value="Register" />
+    </form>
+}

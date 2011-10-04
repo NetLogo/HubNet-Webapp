@@ -9,7 +9,7 @@ import java.io._
 import _root_.util._
 import models.Activity
 
-object Activities extends Controller {
+object Activities extends Controller with Secure {
 
   import views.Activities._
 
