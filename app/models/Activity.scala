@@ -19,10 +19,11 @@ import play.jobs.Job
  * launch() method in order to load it up and make it start running.  This may take a
  * couple of seconds.
  *
- * @param file  The NetLogo model file that this activity will be running.
+ * @param file      The NetLogo model file that this activity will be running.
+ * @param username  The username of the user who started this activity.
  *
  */
-class Activity(val file: File) {
+class Activity(val file: File, val username: String) {
   def id = _id
   private val _id = ActivityManager.registerNewActivity(this)
 

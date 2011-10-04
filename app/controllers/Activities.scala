@@ -17,7 +17,7 @@ object Activities extends Controller with Secure {
   val modelsDir = new File(Play.configuration.getProperty("netlogo.models.path"))
 
   def list = {
-    val runningActivities = ActivityManager.activities.values
+    val runningActivities = ActivityManager.getUserActivities(connectedUser)
 
     val path = new File(modelsDir.getAbsolutePath)
     val availableActivities = path.listFiles().filter(file => file.isFile && file.getName.endsWith(".nlogo")).map(_.getName)
@@ -27,7 +27,7 @@ object Activities extends Controller with Secure {
   def run(model: String) = {
     val file = new File(modelsDir, model)
     if (file.exists) {
-      val activity = new Activity(file)
+      val activity = new Activity(file, connectedUser)
       activity.launchAsync()
       html.run(activity)
     } else {
@@ -37,7 +37,9 @@ object Activities extends Controller with Secure {
   }
 
   def manage(id: Int) = {
-    if (ActivityManager.activities.contains(id) && ActivityManager.activities(id).status.isInstanceOf[ActivityStatus.Running]) {
+    if (ActivityManager.activities.contains(id)
+        && ActivityManager.activities(id).status.isInstanceOf[ActivityStatus.Running]
+        && ActivityManager.activities(id).username == connectedUser) {
       val activity = ActivityManager.activities(id)
       html.manage(activity)
     } else {
@@ -75,7 +77,9 @@ object Activities extends Controller with Secure {
    * Launches a local client in the activity with the given ID.
    */
   def local(id: Int) = {
-    if (ActivityManager.activities.contains(id) && ActivityManager.activities(id).status.isInstanceOf[ActivityStatus.Running]) {
+    if (ActivityManager.activities.contains(id)
+        && ActivityManager.activities(id).status.isInstanceOf[ActivityStatus.Running]
+        && ActivityManager.activities(id).username == connectedUser) {
       val activity = ActivityManager.activities(id)
       html.local(activity.name, activity.port, activity.getNextLocalClientUsername())
     }
@@ -89,7 +93,8 @@ object Activities extends Controller with Secure {
    * running.
    */
   def stop(id: Int) = {
-    if (ActivityManager.activities.contains(id)) {
+    if (ActivityManager.activities.contains(id)
+        && ActivityManager.activities(id).username == connectedUser) {
       val activity = ActivityManager.activities(id)
       activity.stop()
       flash += ("info" -> ("The activity " + activity.name + " has been stopped successfully."))

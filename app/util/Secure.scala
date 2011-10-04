@@ -12,6 +12,7 @@ trait Secure {
   @Before def check = {
     session("username") match {
       case Some(username) =>
+        renderArgs += "user" -> username
         Continue
       case None =>
         flash += ("error" -> "This action requires that you are logged in.")
@@ -19,5 +20,5 @@ trait Secure {
     }
   }
 
-  def connectedUser = renderArgs("user").get
+  def connectedUser: String = renderArgs("user").get.toString
 }

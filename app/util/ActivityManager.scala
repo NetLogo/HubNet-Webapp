@@ -10,6 +10,9 @@ object ActivityManager {
   val activities = mutable.Map.empty[Int, Activity]
   private var idCounter = 0
 
+  /** Gets the list of activities owned by the specified user. */
+  def getUserActivities(username: String) = activities.values.filter(activity => activity.username == username)
+
   /**
    * Adds the given activity to the global activities list and assigns it an ID
    * that could be used to manage it. Returns the ID.
