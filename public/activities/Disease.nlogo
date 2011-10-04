@@ -111,20 +111,23 @@ to go
   ;; get commands and data from the clients
   listen-clients
 
-  every 0.1
+  if on?
   [
-    ;;allow the androids to wander around the view
-    if wander? [ androids-wander ]
-
-    ask turtles with [ infected? ]
-    [ spread-disease ]
-
-    ;; keeps track of the number of times through the go procedure (if there is at least one turtle infected)
-    ;; use an ifelse here to avoid redundant displays because tick forces a display.
-    ;; we only want to keep track of time once the first turtle has been infected.
-    ifelse count turtles with [infected?] > 0
-    [ tick ]
-    [ display ]
+    every 0.1
+    [
+      ;;allow the androids to wander around the view
+      if wander? [ androids-wander ]
+      
+      ask turtles with [ infected? ]
+      [ spread-disease ]
+      
+      ;; keeps track of the number of times through the go procedure (if there is at least one turtle infected)
+      ;; use an ifelse here to avoid redundant displays because tick forces a display.
+      ;; we only want to keep track of time once the first turtle has been infected.
+      ifelse count turtles with [infected?] > 0
+      [ tick ]
+      [ display ]
+    ]
   ]
 end
 
@@ -223,15 +226,21 @@ end
 to listen-clients
   while [ hubnet-message-waiting? ]
   [
+    ;; get the first message in the queue
     hubnet-fetch-message
+    ;; respond to enter and exit messages
     ifelse hubnet-enter-message?
     [ create-new-student ]
     [
       ifelse hubnet-exit-message?
       [ remove-student ]
       [
-        ask students with [ user-id = hubnet-message-source ]
+        ;; respond to other messages only if the model is running
+        if on?
+        [
+          ask students with [ user-id = hubnet-message-source ]
           [ execute-command hubnet-message-tag ]
+        ]
       ]
     ]
   ]
@@ -469,23 +478,6 @@ GRAPHICS-WINDOW
 ticks
 30
 
-BUTTON
-131
-10
-209
-43
-NIL
-go
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
 SLIDER
 31
 181
@@ -504,7 +496,7 @@ HORIZONTAL
 BUTTON
 131
 44
-208
+221
 77
 infect
 infect-turtles
@@ -643,9 +635,9 @@ NIL
 HORIZONTAL
 
 BUTTON
-53
+131
 10
-130
+221
 43
 NIL
 setup
@@ -750,7 +742,7 @@ quick-start
 11
 
 BUTTON
-53
+39
 44
 130
 77
@@ -765,6 +757,17 @@ NIL
 NIL
 NIL
 1
+
+SWITCH
+39
+10
+129
+43
+on?
+on?
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?

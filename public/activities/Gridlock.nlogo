@@ -200,32 +200,35 @@ end
 to go
   ;; get commands and data from the clients
   listen-clients
-
-  every delay
+  
+  if on?
   [
-    ;; clear any accidents from the last time thru the go procedure
-    clear-accidents
-
-    ;; if there are any intersections that are to switch automatically, have them change their color
-    set-signals
-    set num-cars-stopped 0
-
-    ;; set the turtles speed for this time thru the procedure, move them forward their speed,
-    ;; record data for plotting, and set the color of the turtles
-    ;; to an appropriate color based on their speed
-    ask turtles
+    every delay
     [
-      set-car-speed
-      fd speed
-      record-data
-      set-car-color
+      ;; clear any accidents from the last time thru the go procedure
+      clear-accidents
+      
+      ;; if there are any intersections that are to switch automatically, have them change their color
+      set-signals
+      set num-cars-stopped 0
+      
+      ;; set the turtles speed for this time thru the procedure, move them forward their speed,
+      ;; record data for plotting, and set the color of the turtles
+      ;; to an appropriate color based on their speed
+      ask turtles
+      [
+        set-car-speed
+        fd speed
+        record-data
+        set-car-color
+      ]
+      ;; crash the cars if crash? is true
+      if crash?
+      [ crash-cars ]
+      
+      ;; update the clock and the phase
+      clock-tick
     ]
-    ;; crash the cars if crash? is true
-    if crash?
-    [ crash-cars ]
-
-    ;; update the clock and the phase
-    clock-tick
   ]
 end
 
@@ -451,7 +454,9 @@ end
 to listen-clients
   while [hubnet-message-waiting?]
   [
+    ;; get the first message in the queue
     hubnet-fetch-message
+    ;; respond to enter and exit messages
     ifelse hubnet-enter-message?
     [
       give-intersection-coords
@@ -463,11 +468,15 @@ to listen-clients
         abandon-intersection
       ]
       [
-        ifelse hubnet-message-tag = "Change Light"
-          [ manual hubnet-message-source ]
+        ;; respond to other messages only if the model is running
+        if on?
         [
-          if hubnet-message-tag = "Phase"
+          ifelse hubnet-message-tag = "Change Light"
+          [ manual hubnet-message-source ]
+          [
+            if hubnet-message-tag = "Phase"
             [ auto hubnet-message-source ]
+          ]
         ]
       ]
     ]
@@ -572,6 +581,7 @@ GRAPHICS-WINDOW
 1
 1
 ticks
+30
 
 TEXTBOX
 7
@@ -582,23 +592,6 @@ This chooser determines which plot is drawn.
 11
 0.0
 0
-
-BUTTON
-94
-237
-176
-270
-login
-listen-clients
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
 
 PLOT
 565
@@ -699,10 +692,10 @@ quick-start
 11
 
 SLIDER
-142
-41
-281
-74
+143
+96
+282
+129
 grid-size-y
 grid-size-y
 1
@@ -714,10 +707,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1
-41
-139
-74
+2
+96
+140
+129
 grid-size-x
 grid-size-x
 1
@@ -729,10 +722,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-98
-113
-188
-146
+99
+168
+189
+201
 auto?
 auto?
 1
@@ -740,10 +733,10 @@ auto?
 -1000
 
 SWITCH
-190
-113
-280
-146
+191
+168
+281
+201
 crash?
 crash?
 1
@@ -751,10 +744,10 @@ crash?
 -1000
 
 SWITCH
-1
-113
-96
-146
+2
+168
+97
+201
 power?
 power?
 0
@@ -762,10 +755,10 @@ power?
 -1000
 
 SLIDER
-1
-77
-280
-110
+2
+132
+281
+165
 number
 number
 0
@@ -794,28 +787,11 @@ false
 PENS
 "default" 1.0 0 -1893860 true "" "hide-or-show-pen \"Stopped Cars\"\nplot num-cars-stopped\n"
 
-BUTTON
-177
-237
-259
-270
-NIL
-go
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
 SLIDER
-1
-149
-153
-182
+2
+204
+154
+237
 simulation-speed
 simulation-speed
 0
@@ -827,10 +803,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-155
-149
-280
-182
+156
+204
+281
+237
 speed-limit
 speed-limit
 0
@@ -842,10 +818,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-11
-237
-93
-270
+129
+61
+214
+94
 NIL
 setup
 NIL
@@ -859,10 +835,10 @@ NIL
 1
 
 MONITOR
-175
-185
-280
-230
+176
+240
+281
+285
 Current Phase
 phase
 3
@@ -870,10 +846,10 @@ phase
 11
 
 SLIDER
-1
-201
-173
-234
+2
+240
+174
+273
 ticks-per-cycle
 ticks-per-cycle
 1
@@ -910,6 +886,17 @@ NIL
 NIL
 NIL
 1
+
+SWITCH
+36
+61
+126
+94
+on?
+on?
+1
+1
+-1000
 
 @#$#@#$#@
 WHAT IS IT?

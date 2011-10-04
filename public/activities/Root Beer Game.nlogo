@@ -114,23 +114,29 @@ to go
   ;; of the clients. when everyone on the team has placed an order
   ;; the entire team moves on the next week. Teams may be on different days
   listen-to-clients
-  every 0.1
+  if on?
   [
-    display
+    every 0.1
+    [
+      display
+    ]
   ]
 end
 
 to listen-to-clients
   while [ hubnet-message-waiting? ]
   [
+    ;; get the first message in the queue
     hubnet-fetch-message
+    ;; respond to enter and exit messages
     ifelse hubnet-enter-message?
     [ create-new-student ]
     [
       ifelse hubnet-exit-message?
       [ remove-student ]
       [
-        execute-command hubnet-message-tag
+        ;; respond to other messages only if the model is running
+        if on? [ execute-command hubnet-message-tag ]
       ]
     ]
   ]
@@ -542,32 +548,16 @@ GRAPHICS-WINDOW
 1
 0
 ticks
+30
 
 BUTTON
-58
-62
-161
-95
+167
+54
+270
+87
 NIL
 setup
 NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-164
-62
-267
-95
-NIL
-go
-T
 1
 T
 OBSERVER
@@ -660,6 +650,17 @@ periods-of-delay
 1
 NIL
 HORIZONTAL
+
+SWITCH
+60
+54
+163
+87
+on?
+on?
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?

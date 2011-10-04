@@ -138,27 +138,30 @@ to go
   ;; get commands and data from the clients
   listen-clients
 
-  every 0.1
+  if on?
   [
-    ;; allow the androids and doctors to wander around the view
-    if wander?
+    every 0.1
+    [
+      ;; allow the androids and doctors to wander around the view
+      if wander?
       [ wander ]
-
-    ask turtles with [ infected? ]
+      
+      ask turtles with [ infected? ]
       [ spread-disease ]
-
-    ask doctors [ heal ]
-
-    tick
-    plot count turtles with [ infected? ]
-  ]
-  ;; we don't want to reset the turtle shapes every time
-  ;; through go but we do want to respond to the show-sick?
-  ;; switch so keep track of when it's changed
-  if show-sick? != old-show-sick?
-  [
-    ask turtles with [infected?] [ set-sick-shape ]
-    set old-show-sick? show-sick?
+      
+      ask doctors [ heal ]
+      
+      tick
+      plot count turtles with [ infected? ]
+    ]
+    ;; we don't want to reset the turtle shapes every time
+    ;; through go but we do want to respond to the show-sick?
+    ;; switch so keep track of when it's changed
+    if show-sick? != old-show-sick?
+    [
+      ask turtles with [infected?] [ set-sick-shape ]
+      set old-show-sick? show-sick?
+    ]
   ]
 end
 
@@ -273,13 +276,18 @@ end
 to listen-clients
   while [ hubnet-message-waiting? ]
   [
+    ;; get the first message in the queue
     hubnet-fetch-message
+    ;; respond to enter and exit messages
     ifelse hubnet-enter-message?
     [ create-new-student ]
     [
       ifelse hubnet-exit-message?
       [ remove-student ]
-      [ execute-command hubnet-message-tag ]
+      [
+        ;; respond to other messages only if the model is running
+        if on? [ execute-command hubnet-message-tag ]
+      ]
     ]
   ]
 
@@ -509,29 +517,13 @@ GRAPHICS-WINDOW
 1
 1
 ticks
-
-BUTTON
-182
-15
-265
-48
-NIL
-go
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
+30
 
 SLIDER
-157
-133
-304
-166
+155
+140
+302
+173
 infection-chance
 infection-chance
 0
@@ -543,10 +535,10 @@ infection-chance
 HORIZONTAL
 
 BUTTON
-97
-50
-180
-83
+75
+65
+165
+98
 infect
 infect-turtles
 NIL
@@ -560,10 +552,10 @@ NIL
 1
 
 BUTTON
-29
-170
-155
-203
+27
+177
+153
+210
 NIL
 make-androids
 NIL
@@ -595,10 +587,10 @@ PENS
 "default" 1.0 0 -16777216 true "" ""
 
 SLIDER
-158
-242
-306
-275
+156
+249
+304
+282
 android-delay
 android-delay
 0
@@ -610,10 +602,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-158
-170
-305
-203
+156
+177
+303
+210
 num-androids
 num-androids
 1
@@ -625,10 +617,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-43
-115
+41
+122
+153
 155
-148
 show-sick?
 show-sick?
 0
@@ -636,10 +628,10 @@ show-sick?
 -1000
 
 SWITCH
-43
-259
-155
-292
+41
+266
+153
+299
 wander?
 wander?
 0
@@ -669,10 +661,10 @@ count turtles with [ infected? ]
 11
 
 SLIDER
-157
-98
-304
-131
+155
+105
+302
+138
 initial-number-sick
 initial-number-sick
 1
@@ -684,10 +676,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-97
-15
-180
-48
+170
+25
+260
+58
 NIL
 setup
 NIL
@@ -763,10 +755,10 @@ quick-start
 11
 
 SLIDER
-158
-205
-305
-238
+156
+212
+303
+245
 num-doctors
 num-doctors
 0
@@ -778,10 +770,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-158
-277
-306
-310
+156
+284
+304
+317
 doctor-delay
 doctor-delay
 0
@@ -793,10 +785,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-29
-205
-155
-238
+27
+212
+153
+245
 NIL
 make-doctors
 NIL
@@ -810,10 +802,10 @@ NIL
 1
 
 BUTTON
-145
-332
-238
-365
+142
+326
+235
+359
 clear-plot
 clear-all-plots\nset run-number 1\nsetup-plot
 NIL
@@ -827,10 +819,10 @@ NIL
 1
 
 BUTTON
-182
-50
-265
-83
+170
+65
+260
+98
 NIL
 cure-all
 NIL
@@ -842,6 +834,17 @@ NIL
 NIL
 NIL
 1
+
+SWITCH
+75
+25
+165
+58
+on?
+on?
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1522,5 +1525,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@

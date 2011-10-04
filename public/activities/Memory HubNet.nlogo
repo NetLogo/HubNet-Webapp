@@ -82,12 +82,16 @@ end
 ;;
 
 to go
-  if not any? cards [
-    __hubnet-broadcast-user-message winner-message
-    user-message winner-message
-    stop
+  if on?
+  [
+    if not any? cards [
+      __hubnet-broadcast-user-message winner-message
+      user-message winner-message
+      stop
+    ]
   ]
   listen-clients
+  display
 end
 
 to-report winner-message
@@ -104,15 +108,21 @@ end
 to listen-clients
   while [hubnet-message-waiting?]
   [
+    ;; get the first message in the queue
     hubnet-fetch-message
+    ;; respond to enter and exit messages
     ifelse hubnet-enter-message?
     [ add-player hubnet-message-source ][
       ifelse hubnet-exit-message?
       [ remove-player hubnet-message-source ]
       [
-        let p item current-player sort players
-        if hubnet-message-tag = "View" and [user-name] of p = hubnet-message-source
-        [ ask p [ select-card first hubnet-message last hubnet-message ] ]
+        ;; respond to other messages only if the model is running
+        if on?
+        [
+          let p item current-player sort players
+          if hubnet-message-tag = "View" and [user-name] of p = hubnet-message-source
+          [ ask p [ select-card first hubnet-message last hubnet-message ] ]
+        ]
       ]
     ]
   ]
@@ -224,32 +234,16 @@ GRAPHICS-WINDOW
 1
 1
 ticks
+30
 
 BUTTON
-38
+96
 120
-145
+203
 153
 NIL
 deal
 NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-148
-120
-254
-153
-NIL
-go
-T
 1
 T
 OBSERVER
@@ -357,10 +351,10 @@ current-player
 11
 
 BUTTON
-97
-48
-203
-81
+153
+45
+259
+78
 NIL
 setup
 NIL
@@ -372,6 +366,17 @@ NIL
 NIL
 NIL
 1
+
+SWITCH
+48
+45
+149
+78
+on?
+on?
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?

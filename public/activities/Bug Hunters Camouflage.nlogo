@@ -85,12 +85,16 @@ end
 ;;;;;;;;;;;;;;;;;;;;;
 
 to go
-  grow-bugs
-  reproduce-bugs
+  ;; process incoming messages and respond to them (if needed).
   listen-clients
-  every 0.01
-  [ tick ]
-  do-plots
+  if on?
+  [
+    grow-bugs
+    reproduce-bugs
+    every 0.01
+    [ tick ]
+    do-plots
+  ]
 end
 
 to grow-bugs
@@ -204,17 +208,23 @@ end
 to listen-clients
   while [hubnet-message-waiting?]
   [
+    ;; get the first message in the queue
     hubnet-fetch-message
+    ;; respond to enter and exit messages
     ifelse hubnet-enter-message?
     [ add-player ]
     [
       ifelse hubnet-exit-message?
-     [ remove-player ]
-     [
-        if hubnet-message-tag = "View"
+      [ remove-player ]
+      [
+        ;; respond to other messages only if the model is running
+        if on?
         [
-          ask players with [ user-name = hubnet-message-source ]
+          if hubnet-message-tag = "View"
+          [
+            ask players with [ user-name = hubnet-message-source ]
             [ eat-bugs ]
+          ]
         ]
       ]
     ]
@@ -357,32 +367,16 @@ GRAPHICS-WINDOW
 1
 1
 ticks
+30
 
 BUTTON
-13
+105
 10
-91
+183
 43
 NIL
 setup
 NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-93
-10
-171
-43
-NIL
-go
-T
 1
 T
 OBSERVER
@@ -404,7 +398,7 @@ leader-caught
 11
 
 SLIDER
-174
+189
 10
 339
 43
@@ -580,6 +574,17 @@ leader
 3
 1
 11
+
+SWITCH
+10
+10
+100
+43
+on?
+on?
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1125,5 +1130,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@
